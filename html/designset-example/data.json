@@ -1,0 +1,427 @@
+{
+  "shop": {
+    "name": "サンプルショップ",
+    "copyright": "© 2024 Sample Shop. All rights reserved.",
+    "address": "〒150-0002 東京都渋谷区渋谷1-1-1",
+    "tel": "03-1234-5678",
+    "favicon_url": "/favicon.ico",
+    "logo_url": "https://placehold.jp/200x60.png?text=Shop%20Logo",
+    "is_point_enabled": true,
+    "is_member_entry_enabled": true,
+    "is_mail_magazine_enabled": true,
+    "comment": "<p>サンプルショップへようこそ！こちらは開発環境用のサンプルテキストです。</p>",
+    "mainvisual": "<div id=\"M_slider\"><ul><li><img src=\"https://placehold.jp/1000x260.png?text=Main%20Visual%201\" alt=\"メインビジュアル1\"></li></div>",
+    "banner": {
+      "has_item": true,
+      "list": [
+        {
+          "url": "/category/new",
+          "target": "_self",
+          "image_url": "https://placehold.jp/600x200.png?text=Banner%201"
+        },
+        {
+          "url": "/category/sale",
+          "target": "_self", 
+          "image_url": "https://placehold.jp/600x200.png?text=Banner%202"
+        }
+      ]
+    }
+  },
+  "page": {
+    "title": "サンプルショップ - デザインテンプレート開発環境",
+    "description": "MakeShop デザインテンプレート開発環境のサンプルページです。",
+    "css": "#",
+    "javascript": "#",
+    "canonical_url": "http://localhost:8080"
+  },
+  "new_item": {
+    "list": [
+      {
+        "url": "/item/sample1",
+        "name": "新商品サンプル1",
+        "image_L": "https://placehold.jp/512x512.png?text=New%20Item%20L1",
+        "image_S": "https://placehold.jp/200x200.png?text=New%20Item%20S1",
+        "price": 1980,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/1",
+        "favorite_entry_url": "/favorite/add/1",
+        "favorite_remove_url": "/favorite/remove/1",
+        "is_favorite": false,
+        "base_category": {
+          "url": "/category/electronics",
+          "name": "家電"
+        },
+        "has_review": true,
+        "review": {
+          "star_html": "<span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar starOff\"></span>",
+          "average": 4.2,
+          "total_count": 15,
+          "url": "/review/item/1"
+        }
+      },
+      {
+        "url": "/item/sample2",
+        "name": "新商品サンプル2",
+        "image_L": "https://placehold.jp/512x512.png?text=New%20Item%20L2",
+        "image_S": "https://placehold.jp/200x200.png?text=New%20Item%20S2",
+        "price": 2980,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/2",
+        "favorite_entry_url": "/favorite/add/2",
+        "favorite_remove_url": "/favorite/remove/2",
+        "is_favorite": false,
+        "base_category": {
+          "url": "/category/fashion",
+          "name": "ファッション"
+        },
+        "has_review": false
+      }
+    ]
+  },
+  "recommend_item": {
+    "list": [
+      {
+        "url": "/item/recommend1",
+        "name": "おすすめ商品1",
+        "image_L": "https://placehold.jp/512x512.png?text=Rec%20Item%20L1",
+        "image_S": "https://placehold.jp/200x200.png?text=Rec%20Item%20S1",
+        "price": 3980,
+        "original_price": 4980,
+        "is_soldout": false,
+        "is_sale": true,
+        "sale_rate": 20,
+        "cart_entry_url": "/cart/add/3",
+        "favorite_entry_url": "/favorite/add/3",
+        "favorite_remove_url": "/favorite/remove/3",
+        "is_favorite": false,
+        "base_category": {
+          "url": "/category/books",
+          "name": "書籍"
+        },
+        "has_review": true,
+        "review": {
+          "star_html": "<span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span>",
+          "average": 5.0,
+          "total_count": 23,
+          "url": "/review/item/3"
+        }
+      }
+    ]
+  },
+  "special_item": {
+    "list": [
+      {
+        "url": "/item/special1",
+        "name": "スペシャル商品1",
+        "image_L": "https://placehold.jp/512x512.png?text=Special%20Item%20L1",
+        "image_S": "https://placehold.jp/200x200.png?text=Special%20Item%20S1",
+        "price": 5980,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/4",
+        "favorite_entry_url": "/favorite/add/4",
+        "favorite_remove_url": "/favorite/remove/4",
+        "is_favorite": false,
+        "base_category": {
+          "url": "/category/sports",
+          "name": "スポーツ"
+        },
+        "has_review": true,
+        "review": {
+          "star_html": "<span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar starHalf\"></span><span class=\"reviewRateStar starOff\"></span>",
+          "average": 3.5,
+          "total_count": 8,
+          "url": "/review/item/4"
+        }
+      }
+    ]
+  },
+  "ranking_item": {
+    "list": [
+      {
+        "url": "/item/ranking1",
+        "name": "ランキング1位商品",
+        "image_L": "https://placehold.jp/512x512.png?text=Ranking%20Item%20L1",
+        "image_S": "https://placehold.jp/200x200.png?text=Ranking%20Item%20S1",
+        "price": 1500,
+        "num": 1,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/5",
+        "favorite_entry_url": "/favorite/add/5",
+        "favorite_remove_url": "/favorite/remove/5",
+        "is_favorite": false,
+        "base_category": {
+          "url": "/category/food",
+          "name": "食品"
+        },
+        "has_review": true,
+        "review": {
+          "star_html": "<span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar starOff\"></span>",
+          "average": 4.0,
+          "total_count": 45,
+          "url": "/review/item/5"
+        }
+      },
+      {
+        "url": "/item/ranking2",
+        "name": "ランキング2位商品",
+        "image_L": "https://placehold.jp/512x512.png?text=Ranking%20Item%20L2",
+        "image_S": "https://placehold.jp/200x200.png?text=Ranking%20Item%20S2",
+        "price": 2200,
+        "num": 2,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/6",
+        "favorite_entry_url": "/favorite/add/6",
+        "favorite_remove_url": "/favorite/remove/6",
+        "is_favorite": true,
+        "base_category": {
+          "url": "/category/beauty",
+          "name": "美容"
+        },
+        "has_review": false
+      }
+    ]
+  },
+  "recently_item": {
+    "list": [
+      {
+        "url": "/item/recent1",
+        "name": "最近チェックした商品1",
+        "image_L": "https://placehold.jp/512x512.png?text=Recent%20Item%20L1",
+        "image_S": "https://placehold.jp/200x200.png?text=Recent%20Item%20S1",
+        "price": 880,
+        "is_soldout": false,
+        "is_sale": false,
+        "cart_entry_url": "/cart/add/7",
+        "base_category": {
+          "url": "/category/accessories",
+          "name": "アクセサリー"
+        }
+      }
+    ]
+  },
+  "latest_news": {
+    "has_item": true,
+    "list": [
+      {
+        "url": "/news/1",
+        "title": "新商品入荷のお知らせ",
+        "content": "春の新商品が続々と入荷しております。ぜひご覧ください。",
+        "date": {
+          "year": "2024",
+          "month": "03",
+          "day": "15",
+          "hour": "10",
+          "minute": "30"
+        }
+      },
+      {
+        "url": "/news/2", 
+        "title": "送料無料キャンペーン開催中",
+        "content": "5000円以上のお買い上げで送料無料になります。",
+        "date": {
+          "year": "2024",
+          "month": "03",
+          "day": "10",
+          "hour": "14",
+          "minute": "00"
+        }
+      }
+    ]
+  },
+  "review_item": {
+    "has_item": true,
+    "list": [
+      {
+        "url": "/item/review1",
+        "name": "レビュー商品1",
+        "image_S": "https://placehold.jp/200x200.png?text=Review%20Item%20S1",
+        "reviewer_name": "山田太郎",
+        "star_html": "<span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span><span class=\"reviewRateStar\"></span>",
+        "score": 5,
+        "content": "とても良い商品でした。また購入したいと思います。",
+        "date": {
+          "year": "2024",
+          "month": "03",
+          "day": "12",
+          "hour": "15",
+          "minute": "30"
+        },
+        "base_category": {
+          "url": "/category/home",
+          "name": "ホーム用品"
+        }
+      }
+    ]
+  },
+  "category_menu": {
+    "list": [
+      {
+        "name": "家電",
+        "url": "/category/electronics",
+        "child_category": {
+          "has_item": true,
+          "list": [
+            {
+              "name": "テレビ",
+              "url": "/category/electronics/tv"
+            },
+            {
+              "name": "冷蔵庫",
+              "url": "/category/electronics/refrigerator"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ファッション",
+        "url": "/category/fashion",
+        "child_category": {
+          "has_item": true,
+          "list": [
+            {
+              "name": "メンズ",
+              "url": "/category/fashion/mens"
+            },
+            {
+              "name": "レディース",
+              "url": "/category/fashion/ladies"
+            }
+          ]
+        }
+      },
+      {
+        "name": "書籍",
+        "url": "/category/books",
+        "child_category": {
+          "has_item": false
+        }
+      }
+    ]
+  },
+  "bulk_menu": {
+    "has_item": false,
+    "list": []
+  },
+  "search_form": {
+    "keyword_id": "search_keyword",
+    "category_id": "search_category",
+    "price_low_id": "search_price_low",
+    "price_high_id": "search_price_high",
+    "original_code_id": "search_original_code",
+    "search_url": "/search",
+    "category_list": [
+      {
+        "code": "",
+        "name": "すべてのカテゴリー"
+      },
+      {
+        "code": "electronics",
+        "name": "家電"
+      },
+      {
+        "code": "fashion",
+        "name": "ファッション"
+      },
+      {
+        "code": "books",
+        "name": "書籍"
+      }
+    ]
+  },
+  "search": {
+    "keyword": "",
+    "category": {
+      "code": "",
+      "name": ""
+    },
+    "price_low": "",
+    "price_high": "",
+    "original_code": ""
+  },
+  "calendar1": {
+    "year": "2024",
+    "month": "3",
+    "html": "<table class=\"makeshop-calendar1\"><thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr><td class=\"day1\">1</td><td class=\"day2\">2</td><td class=\"day3\">3</td><td class=\"day4\">4</td><td class=\"day5\">5</td><td class=\"day6\">6</td><td class=\"day7\">7</td></tr></tbody></table>",
+    "date_list": [
+      {
+        "color": "#ff0000",
+        "description": "セール開催日",
+        "day_list": ["1", "15"]
+      }
+    ]
+  },
+  "calendar2": {
+    "year": "2024",
+    "month": "4",
+    "html": "<table class=\"makeshop-calendar2\"><thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr><td class=\"day1\">1</td><td class=\"day2\">2</td><td class=\"day3\">3</td><td class=\"day4\">4</td><td class=\"day5\">5</td><td class=\"day6\">6</td><td class=\"day7\">7</td></tr></tbody></table>",
+    "date_list": []
+  },
+  "item": {
+    "name": "test",
+    "image_L": "https://placehold.jp/512x512.png?text=NO IMAGE",
+    "price_html": "500",
+    "price": 500,
+    "original_price": 500,
+    "point_html": "0",
+    "base_category": {
+      "url": "/view/category/sample1",
+      "name": "サンプルカテゴリー1"
+    },
+    "quantity_id": "makeshop-item-quantity",
+    "order_quantity_min": 1,
+    "is_within_sell_period": true,
+    "is_soldout": false,
+    "is_stock_display": true,
+    "is_stock_unlimited": true,
+    "is_small_stock": false,
+    "has_option": false,
+    "is_option_image": false,
+    "is_subscription": false,
+    "is_subscription_only": false,
+    "cart_entry_url": "#makeshop-item-cart-entry-url:1",
+    "favorite_entry_url": "/view/member/login",
+    "favorite_remove_url": "/view/member/login",
+    "is_favorite": false,
+    "contact_url": "#makeshop-item-contact-url",
+    "description": "TESTHOGE",
+    "description2": "",
+    "system_code": "000000000001",
+    "original_code": "",
+    "manufacturer": "",
+    "origin_country": "",
+    "special_display": "",
+    "review": {
+      "is_enabled": false,
+      "has_item": false
+    },
+    "icon": {
+      "has_item": false
+    },
+    "multi_image": {
+      "has_item": false
+    },
+    "add_image": {
+      "has_item": false
+    },
+    "is_sale": false,
+    "is_member_price": false,
+    "is_sell_start": false,
+    "is_sell_end": false,
+    "is_reservation_sale": false,
+    "is_name_print": false,
+    "breadcrumb_list_group": {
+      "has_item": false
+    },
+    "is_restock_enabled": false,
+    "sns": {
+      "twitter": "",
+      "line": "",
+      "facebook": ""
+    }
+  }
+} 
