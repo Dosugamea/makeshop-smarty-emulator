@@ -1,7 +1,48 @@
-<ifModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.+)$ theme/$1 [L]
-</ifModule>
+
+# デザインセットの静的ファイルへのアクセス
+# /designsets/DESIGN_SET_NAME/path/to/file にアクセスした場合
+# makeshop.php?designset=DESIGN_SET_NAME&static=path/to/file にリダイレクト
+RewriteRule ^designsets/([^/]+)/(.+)$ makeshop.php?designset=$1&static=$2 [L,QSA]
+
+# 通常のMakeShopテンプレートアクセス
+# その他のルールがない場合はそのまま処理
+
+# DirectoryIndex の設定
+DirectoryIndex index.php index.html
+
+# エラーページの設定
+ErrorDocument 404 /index.php
+
+# 文字エンコーディングの設定
+AddDefaultCharset UTF-8
+
+# セキュリティヘッダーの設定
+# Header always set X-Content-Type-Options nosniff
+# Header always set X-Frame-Options DENY
+# Header always set X-XSS-Protection "1; mode=block"
+
+# 静的ファイルのキャッシュ設定
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+
+# Gzip圧縮の設定
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>

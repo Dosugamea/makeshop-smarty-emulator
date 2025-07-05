@@ -2,3 +2,5 @@
 /app/*.lock
 /html/theme
 /html/templates_c
+/html/designset-*
+!html/designset-example
