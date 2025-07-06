@@ -196,7 +196,8 @@ function main(): void {
             $renderedHtml = render_template(
                 $params['designset'],
                 $params['template'],
-                $params['data']
+                $params['data'],
+                true  // API経由の場合は常にアセットをインライン化
             );
             debug_log("Local template rendered successfully, length: " . strlen($renderedHtml));
         }

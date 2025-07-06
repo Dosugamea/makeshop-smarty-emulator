@@ -23,10 +23,10 @@ function load_json(string $filename): array {
         return [];
     }
 
-    $json = file_get_contents($filename);
+        $json = file_get_contents($filename);
     if ($json === false) {
-        return [];
-    }
+    return [];
+}
 
     $data = json_decode($json, true);
     return is_array($data) ? $data : [];
@@ -294,7 +294,7 @@ function convert_encoding_if_needed(string $content, string $from_encoding, stri
     if ($from_encoding === $to_encoding) {
         return $content;
     }
-
+    
     $converted = mb_convert_encoding($content, $to_encoding, $from_encoding);
     return $converted !== false ? $converted : $content;
 }
@@ -320,7 +320,7 @@ function load_design_set_data(string $designSetPath): array {
     if (is_file($configJsonPath)) {
         $config = load_json($configJsonPath);
         if (!empty($config)) {
-            $data['config'] = $config;
+        $data['config'] = $config;
         }
     }
     
@@ -404,14 +404,14 @@ function load_modules(string $modulePath, array $data): array {
             if ($moduleEncoding === 'EUC-JP') {
                 $moduleContent = file_get_contents($filename);
                 if ($moduleContent !== false) {
-                    $utf8Content = mb_convert_encoding($moduleContent, 'UTF-8', 'EUC-JP');
-                    
-                    // 一時ファイルを作成してSmartyで処理
-                    $tempFile = tempnam(sys_get_temp_dir(), 'smarty_module_');
+                $utf8Content = mb_convert_encoding($moduleContent, 'UTF-8', 'EUC-JP');
+                
+                // 一時ファイルを作成してSmartyで処理
+                $tempFile = tempnam(sys_get_temp_dir(), 'smarty_module_');
                     if ($tempFile !== false) {
-                        file_put_contents($tempFile, $utf8Content);
-                        $modules[$id] = $smarty->fetch($tempFile);
-                        unlink($tempFile);
+                file_put_contents($tempFile, $utf8Content);
+                $modules[$id] = $smarty->fetch($tempFile);
+                unlink($tempFile);
                     }
                 }
             } else {
@@ -514,16 +514,16 @@ function setup_page_data(string $designSetName): array {
 function generate_additional_css_link(string $designSetName, string $templateName): string {
     // テンプレート名から拡張子を除去
     $templateBaseName = pathinfo($templateName, PATHINFO_FILENAME);
-
+    
     // 同名のCSSファイルが存在するかチェック
     $cssPath = "{$designSetName}/standard/css/{$templateBaseName}.css";
-
+    
     if (is_file($cssPath)) {
         // CSSファイルが存在する場合、linkタグを生成
         $cssUrl = "/designsets/{$designSetName}/standard/css/{$templateBaseName}.css";
         return "<link href=\"{$cssUrl}\" rel=\"stylesheet\">\n";
     }
-
+    
     return '';
 }
 
@@ -537,12 +537,12 @@ function generate_additional_css_link(string $designSetName, string $templateNam
 function smarty_modifier_cut_html(string $string, int $length = 100, string $etc = '...'): string {
     // HTMLタグを除去
     $string = strip_tags($string);
-
+    
     // 文字数制限
     if (mb_strlen($string, 'UTF-8') > $length) {
         $string = mb_substr($string, 0, $length, 'UTF-8') . $etc;
     }
-
+    
     return $string;
 }
 
@@ -613,147 +613,108 @@ function register_makeshop_modifiers(Smarty $smarty): void {
 // =============================================================================
 
 /**
- * テンプレートをレンダリングして結果を返す
- *
- * @param string $designSetName デザインセット名
- * @param string $templateName テンプレート名
- * @param array $additionalData 追加データ（data.jsonに上書きマージされる）
- * @return string レンダリング結果
- * @throws Exception エラーが発生した場合
+ * ローカルファイルからCSSとJavaScriptを直接埋め込む形式で生成する
  */
-function render_template(string $designSetName, string $templateName, array $additionalData = []): string {
-    // デザインセットのパスを検証
-    $designSetPath = $designSetName;
-    if (!is_dir($designSetPath)) {
-        throw new Exception("デザインセットフォルダが見つかりません: {$designSetPath}");
+function generate_inline_assets_from_local(string $designSetPath, string $templateName): string {
+    $inlineAssets = '';
+    
+    // CSSファイルを探して埋め込む
+    $cssFiles = [];
+    
+    // 1. common.css を探す
+    $commonCssPath = "{$designSetPath}/standard/css/common.css";
+    if (is_file($commonCssPath)) {
+        $cssFiles['common.css'] = $commonCssPath;
     }
-
-    // テンプレートファイルのパスを検証
-    $templatePath = "{$designSetPath}/standard/html/{$templateName}";
-    if (!is_file($templatePath)) {
-        throw new Exception("テンプレートファイルが見つかりません: {$templatePath}");
+    
+    // 2. テンプレート固有のCSSを探す
+    $cssFileName = pathinfo($templateName, PATHINFO_FILENAME) . '.css';
+    $cssPath = "{$designSetPath}/standard/css/{$cssFileName}";
+    if (is_file($cssPath)) {
+        $cssFiles[$cssFileName] = $cssPath;
     }
-
-    $templateEncoding = detect_file_encoding($templatePath);
-
-    // データの読み込みとマージ
-    $data = setup_page_data($designSetName);
-    $data = array_merge($data, load_design_set_data($designSetPath));
-    if (!empty($additionalData)) {
-        // 追加データで既存のデータを上書き
-        $data = array_replace_recursive($data, $additionalData);
-    }
-
-    // テンプレート固有のCSSファイルがあれば、<head>内に追加
-    $additionalCss = generate_additional_css_link($designSetName, $templateName);
-    if ($additionalCss) {
-        if (!isset($data['makeshop']['head'])) {
-            $data['makeshop']['head'] = '';
-        }
-        $data['makeshop']['head'] .= $additionalCss;
-    }
-
-    // モジュールを読み込む
-    $modulePath = $designSetPath . '/_module_/';
-    $data['module'] = load_modules($modulePath, $data);
-
-    // Smarty の設定
-    $smarty = new Smarty();
-    $smarty->left_delimiter = LEFT_DELIMITER;
-    $smarty->right_delimiter = RIGHT_DELIMITER;
-    register_makeshop_modifiers($smarty);
-    $smarty->assign($data, null, true);
-
-    // テンプレートを描画して文字列として取得
-    if ($templateEncoding === 'EUC-JP') {
-        $templateContent = file_get_contents($templatePath);
-        if ($templateContent === false) {
-            throw new Exception("テンプレートファイルの読み込みに失敗しました: {$templatePath}");
-        }
-
-        $utf8Content = mb_convert_encoding($templateContent, 'UTF-8', 'EUC-JP');
-        $tempFile = tempnam(sys_get_temp_dir(), 'smarty_template_');
-        if ($tempFile === false) {
-            throw new Exception("一時ファイルの作成に失敗しました");
-        }
-        file_put_contents($tempFile, $utf8Content);
-        $output = $smarty->fetch($tempFile);
-        unlink($tempFile);
-    } else {
-        $output = $smarty->fetch($templatePath);
-    }
-    return $output;
-}
-
-/**
- * 静的ファイルを処理する
- *
- * @param string $designSetName デザインセット名
- * @param string $staticPath 静的ファイルのパス
- */
-function serve_static_file(string $designSetName, string $staticPath): void {
-    $designSetPath = $designSetName;
-    $fullPath = $designSetPath . '/' . $staticPath;
-
-    if (!is_file($fullPath)) {
-        header("HTTP/1.0 404 Not Found");
-        echo "File not found: {$staticPath}";
-        exit;
-    }
-
-    $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
-
-    // 静的ファイルのエンコーディングも判別
-    $staticEncoding = detect_file_encoding($fullPath);
-
-    switch ($ext) {
-        case 'css':
-            header('Content-Type: text/css; charset=utf-8');
-            // CSS内容がEUC-JPの場合はUTF-8に変換して出力
-            if ($staticEncoding === 'EUC-JP') {
-                $content = file_get_contents($fullPath);
-                if ($content !== false) {
-                    echo mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
+    
+    // 3. その他のCSSファイルも探す
+    $cssDir = "{$designSetPath}/standard/css/";
+    if (is_dir($cssDir)) {
+        $cssGlob = glob($cssDir . '*.css');
+        if ($cssGlob !== false) {
+            foreach ($cssGlob as $cssFile) {
+                $fileName = basename($cssFile);
+                if (!isset($cssFiles[$fileName])) {
+                    $cssFiles[$fileName] = $cssFile;
                 }
-            } else {
-                readfile($fullPath);
             }
-            break;
-        case 'js':
-            header('Content-Type: application/javascript; charset=utf-8');
-            // JavaScript内容がEUC-JPの場合はUTF-8に変換して出力
-            if ($staticEncoding === 'EUC-JP') {
-                $content = file_get_contents($fullPath);
-                if ($content !== false) {
-                    echo mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
-                }
-            } else {
-                readfile($fullPath);
-            }
-            break;
-        case 'jpg':
-        case 'jpeg':
-            header('Content-Type: image/jpeg');
-            readfile($fullPath);
-            break;
-        case 'png':
-            header('Content-Type: image/png');
-            readfile($fullPath);
-            break;
-        case 'gif':
-            header('Content-Type: image/gif');
-            readfile($fullPath);
-            break;
-        case 'svg':
-            header('Content-Type: image/svg+xml');
-            readfile($fullPath);
-            break;
-        default:
-            header('Content-Type: application/octet-stream');
-            readfile($fullPath);
+        }
     }
-
-    exit;
+    
+    // CSSファイルを<style>タグで埋め込む
+    foreach ($cssFiles as $fileName => $filePath) {
+        $content = file_get_contents($filePath);
+        if ($content !== false) {
+            $cssEncoding = detect_file_encoding($filePath);
+            
+            // EUC-JPの場合はUTF-8に変換
+            if ($cssEncoding === 'EUC-JP') {
+                $content = mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
+            }
+            
+            $inlineAssets .= "<style type=\"text/css\">\n";
+            $inlineAssets .= "/* {$fileName} */\n";
+            $inlineAssets .= $content . "\n";
+            $inlineAssets .= "</style>\n";
+        }
+    }
+    
+    // JavaScriptファイルを探して埋め込む
+    $jsFiles = [];
+    
+    // 1. common.js を探す
+    $commonJsPath = "{$designSetPath}/standard/js/common.js";
+    if (is_file($commonJsPath)) {
+        $jsFiles['common.js'] = $commonJsPath;
+    }
+    
+    // 2. テンプレート固有のJavaScriptを探す
+    $jsFileName = pathinfo($templateName, PATHINFO_FILENAME) . '.js';
+    $jsPath = "{$designSetPath}/standard/js/{$jsFileName}";
+    if (is_file($jsPath)) {
+        $jsFiles[$jsFileName] = $jsPath;
+    }
+    
+    // 3. その他のJavaScriptファイルも探す
+    $jsDir = "{$designSetPath}/standard/js/";
+    if (is_dir($jsDir)) {
+        $jsGlob = glob($jsDir . '*.js');
+        if ($jsGlob !== false) {
+            foreach ($jsGlob as $jsFile) {
+                $fileName = basename($jsFile);
+                if (!isset($jsFiles[$fileName])) {
+                    $jsFiles[$fileName] = $jsFile;
+                }
+            }
+        }
+    }
+    
+    // JavaScriptファイルを<script>タグで埋め込む
+    foreach ($jsFiles as $fileName => $filePath) {
+        $content = file_get_contents($filePath);
+        if ($content !== false) {
+            $jsEncoding = detect_file_encoding($filePath);
+            
+            // EUC-JPの場合はUTF-8に変換
+            if ($jsEncoding === 'EUC-JP') {
+                $content = mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
+            }
+            
+            $inlineAssets .= "<script type=\"text/javascript\">\n";
+            $inlineAssets .= "/* {$fileName} */\n";
+            $inlineAssets .= $content . "\n";
+            $inlineAssets .= "</script>\n";
+        }
+    }
+    
+    return $inlineAssets;
 }
 
 /**
@@ -823,7 +784,7 @@ function generate_inline_assets_from_memory(array $files, string $designSetName,
     } elseif (isset($files[$rootCommonJsPath])) {
         $jsFiles['common.js'] = $files[$rootCommonJsPath];
     }
-    
+
     // 2. テンプレート固有のJavaScriptを探す
     $jsFileName = pathinfo($templateName, PATHINFO_FILENAME) . '.js';
     $jsPath = "{$designSetName}/standard/js/{$jsFileName}";
@@ -848,7 +809,7 @@ function generate_inline_assets_from_memory(array $files, string $designSetName,
     // JavaScriptファイルを<script>タグで埋め込む
     foreach ($jsFiles as $fileName => $content) {
         $jsEncoding = detect_encoding_from_memory($content);
-        
+    
         // EUC-JPの場合はUTF-8に変換
         if ($jsEncoding === 'EUC-JP') {
             $content = mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
@@ -861,6 +822,163 @@ function generate_inline_assets_from_memory(array $files, string $designSetName,
     }
     
     return $inlineAssets;
+}
+
+/**
+ * テンプレートをレンダリングして結果を返す
+ *
+ * @param string $designSetName デザインセット名
+ * @param string $templateName テンプレート名
+ * @param array $additionalData 追加データ（data.jsonに上書きマージされる）
+ * @param bool $inlineAssets アセットをインライン化するかどうか（API用）
+ * @return string レンダリング結果
+ * @throws Exception エラーが発生した場合
+ */
+function render_template(string $designSetName, string $templateName, array $additionalData = [], bool $inlineAssets = false): string {
+    // デザインセットのパスを検証
+    $designSetPath = $designSetName;
+    if (!is_dir($designSetPath)) {
+        throw new Exception("デザインセットフォルダが見つかりません: {$designSetPath}");
+    }
+
+    // テンプレートファイルのパスを検証
+    $templatePath = "{$designSetPath}/standard/html/{$templateName}";
+    if (!is_file($templatePath)) {
+        throw new Exception("テンプレートファイルが見つかりません: {$templatePath}");
+    }
+    
+    $templateEncoding = detect_file_encoding($templatePath);
+
+    // データの読み込みとマージ
+    $data = setup_page_data($designSetName);
+    $data = array_merge($data, load_design_set_data($designSetPath));
+    if (!empty($additionalData)) {
+        // 追加データで既存のデータを上書き
+        $data = array_replace_recursive($data, $additionalData);
+    }
+
+    // インライン化する場合は、外部CSSリンクを削除
+    if (!$inlineAssets) {
+        // テンプレート固有のCSSファイルがあれば、<head>内に追加
+        $additionalCss = generate_additional_css_link($designSetName, $templateName);
+        if ($additionalCss) {
+            if (!isset($data['makeshop']['head'])) {
+                $data['makeshop']['head'] = '';
+            }
+            $data['makeshop']['head'] .= $additionalCss;
+        }
+    }
+
+    // モジュールを読み込む
+    $modulePath = $designSetPath . '/_module_/';
+    $data['module'] = load_modules($modulePath, $data);
+
+    // Smarty の設定
+    $smarty = new Smarty();
+    $smarty->left_delimiter = LEFT_DELIMITER;
+    $smarty->right_delimiter = RIGHT_DELIMITER;
+    register_makeshop_modifiers($smarty);
+    $smarty->assign($data, null, true);
+
+    // テンプレートを描画して文字列として取得
+    if ($templateEncoding === 'EUC-JP') {
+        $templateContent = file_get_contents($templatePath);
+        if ($templateContent === false) {
+            throw new Exception("テンプレートファイルの読み込みに失敗しました: {$templatePath}");
+        }
+
+        $utf8Content = mb_convert_encoding($templateContent, 'UTF-8', 'EUC-JP');
+        $tempFile = tempnam(sys_get_temp_dir(), 'smarty_template_');
+        if ($tempFile === false) {
+            throw new Exception("一時ファイルの作成に失敗しました");
+        }
+        file_put_contents($tempFile, $utf8Content);
+        $output = $smarty->fetch($tempFile);
+        unlink($tempFile);
+    } else {
+        $output = $smarty->fetch($templatePath);
+    }
+    
+    // インライン化が必要な場合は、外部リンクを削除してインライン化されたアセットに置き換える
+    if ($inlineAssets) {
+        $inlineAssetsContent = generate_inline_assets_from_local($designSetPath, $templateName);
+        if ($inlineAssetsContent) {
+            $output = replace_external_assets_with_inline($output, $inlineAssetsContent);
+        }
+    }
+    
+    return $output;
+}
+
+/**
+ * 静的ファイルを処理する
+ *
+ * @param string $designSetName デザインセット名
+ * @param string $staticPath 静的ファイルのパス
+ */
+function serve_static_file(string $designSetName, string $staticPath): void {
+    $designSetPath = $designSetName;
+    $fullPath = $designSetPath . '/' . $staticPath;
+    
+    if (!is_file($fullPath)) {
+        header("HTTP/1.0 404 Not Found");
+        echo "File not found: {$staticPath}";
+        exit;
+    }
+
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        
+        // 静的ファイルのエンコーディングも判別
+        $staticEncoding = detect_file_encoding($fullPath);
+        
+        switch ($ext) {
+            case 'css':
+                header('Content-Type: text/css; charset=utf-8');
+                // CSS内容がEUC-JPの場合はUTF-8に変換して出力
+                if ($staticEncoding === 'EUC-JP') {
+                    $content = file_get_contents($fullPath);
+                if ($content !== false) {
+                    echo mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
+                }
+                } else {
+                    readfile($fullPath);
+                }
+                break;
+            case 'js':
+                header('Content-Type: application/javascript; charset=utf-8');
+                // JavaScript内容がEUC-JPの場合はUTF-8に変換して出力
+                if ($staticEncoding === 'EUC-JP') {
+                    $content = file_get_contents($fullPath);
+                if ($content !== false) {
+                    echo mb_convert_encoding($content, 'UTF-8', 'EUC-JP');
+                }
+                } else {
+                    readfile($fullPath);
+                }
+                break;
+            case 'jpg':
+            case 'jpeg':
+                header('Content-Type: image/jpeg');
+                readfile($fullPath);
+                break;
+            case 'png':
+                header('Content-Type: image/png');
+                readfile($fullPath);
+                break;
+            case 'gif':
+                header('Content-Type: image/gif');
+                readfile($fullPath);
+                break;
+            case 'svg':
+                header('Content-Type: image/svg+xml');
+                readfile($fullPath);
+                break;
+            default:
+                header('Content-Type: application/octet-stream');
+                readfile($fullPath);
+        }
+        
+        exit;
 }
 
 /**
@@ -953,7 +1071,7 @@ function render_template_from_memory(array $files, string $designSetName, string
         }
         
         try {
-            file_put_contents($tempFile, $utf8Content);
+        file_put_contents($tempFile, $utf8Content);
             $rendered = $smarty->fetch($tempFile);
             
             // API用：結果をUTF-8のまま返す
@@ -1108,9 +1226,9 @@ if (basename($_SERVER['PHP_SELF']) === 'makeshop.php') {
         } catch (Exception $e) {
             header('Content-Type: text/plain; charset=utf-8');
             echo "Error: " . $e->getMessage();
-        }
-    } else {
-        header('Content-Type: text/plain; charset=utf-8');
+    }
+} else {
+    header('Content-Type: text/plain; charset=utf-8');
         // データの読み込み
         $data = array_merge(
             setup_page_data($designSet),
@@ -1120,10 +1238,10 @@ if (basename($_SERVER['PHP_SELF']) === 'makeshop.php') {
         $modulePath = $designSetPath . '/_module_/';
         $data['module'] = load_modules($modulePath, $data);
 
-        echo "利用可能なデータ (エンコーディング判別機能付き):\n";
-        echo "デザインセット: {$designSet}\n";
-        echo "出力エンコーディング: UTF-8 (固定)\n\n";
-        print_r($data);
+    echo "利用可能なデータ (エンコーディング判別機能付き):\n";
+    echo "デザインセット: {$designSet}\n";
+    echo "出力エンコーディング: UTF-8 (固定)\n\n";
+    print_r($data);
     }
 }
 ?>
