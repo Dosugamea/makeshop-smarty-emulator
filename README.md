@@ -7,22 +7,27 @@
 ![Modified by Claude](https://img.shields.io/badge/Modified%20by-Claude-D97757?style=flat-square&logo=claude)
 ![Modified by Gemini](https://img.shields.io/badge/Modified%20by-Gemini-4285F4?style=flat-square&logo=google-gemini)
 
+本ツールは、GMO makeshopのデザインテンプレート開発を支援するためのSmartyデザインテンプレートエミュレータです（非公式）。
 
-GMO makeshop用のsmartyデザインテンプレート開発環境です。(非公式)
+[do-mu-oi/makeshop-smarty](https://github.com/do-mu-oi/makeshop-smarty) をベースに、機能拡張と利便性の向上を図っています。
 
-このリポジトリは [do-mu-oi/makeshop-smarty](https://github.com/do-mu-oi/makeshop-smarty) をクローンし、改変したものです。
+## 主要機能
 
-## 変更点
-- 1 cdar(Creator-mode Design-set ARchive) を ほぼそのまま利用できるように
-  - エクスポートしたcdarファイルをzipファイルにリネームしてhtmlフォルダ内に展開してください
-- 2 EUC-JPとUTF-8の両方に対応
-  - デフォルトのEUC-JPテンプレートをそのまま読み込めます
-- 3 一部の独自タグに対応
-  - [リファレンスに記載のある一部のタグ](https://reference.makeshop.jp/creator-mode/contents/modifier/index.html)に対応
-- 3 デザインセット選択画面を追加
-  - やや気の利いたデザインセット選択画面が追加されました
-- 4 カラーミーショップのサポート廃止
-  - (当方で利用していないため動作確認できず)
+- **CDARファイルへの完全対応**:
+  - MakeShopからエクスポートされたcdarファイルをほぼそのまま利用可能です。
+  - リモートCDARファイルのレンダリングにも対応しており、URL指定で自動ダウンロード、展開、レンダリングを実行します。
+- **文字エンコーディングの自動判別**:
+  - EUC-JPおよびUTF-8テンプレートに対応。ファイル内容から自動判別し、内部的にUTF-8へ変換することで文字化けを解消します。
+- **makeshop独自Smartyタグへの対応**:
+  - [リファレンスに記載の一部独自タグ](https://reference.makeshop.jp/creator-mode/contents/modifier/index.html)に対応しています。
+- **開発を促進するWeb UI**:
+  - 複数のデザインセット選択画面と、各デザインセットのテンプレート一覧表示機能を提供します。
+- **APIによる動的テンプレートレンダリング**:
+  - `POST /api/render` エンドポイントで、デザインセット名、テンプレート名、埋め込みデータをJSON形式で指定し、レンダリングされたHTMLをJSONで返却します。
+  - アセット（CSS/JS）のインライン化も自動で行われます。
+- **静的ファイルの配信**:
+  - デザインセット内のCSS、JavaScript、画像ファイルなどを適切に配信します。
+  - 文字エンコーディングの自動変換もサポートしており、EUC-JPで記述されたファイルも利用可能です。
 
 ## セットアップ
 
@@ -32,63 +37,27 @@ $ cd makeshop-smarty-emulator/
 $ docker-compose up
 ```
 
-http://localhost:8080 でアクセスできます。
+上記コマンド実行後、http://localhost:8080 でアクセス可能になります。
 
-### 一部 Linux 環境で Permission Error が発生する件
+### Linux環境におけるPermission Errorへの対処
 
-一部の Linux 環境ではコンテナ内の Apache 実行ユーザーをコンテナ実行ユーザーに合わせる必要があります。
+一部のLinux環境では、コンテナ内のApache実行ユーザーをコンテナ実行ユーザーに合わせる必要があります。エラーが発生した場合、以下のコマンドを試行してください。
 
 ```bash
 $ docker exec -it makeshop-smarty_php_1 bash
-# コンテナ実行ユーザー 1000:1000 の場合
+# コンテナ実行ユーザーが 1000:1000 の場合
 $ usermod -u 1000 www-data ; groupmod -g 1000 www-data ; /etc/init.d/apache2 reload
-```
-
-## ディレクトリ構成
-
-### デザインセット対応版の構成
-
-htmlフォルダ内に `designset-*` フォルダを配置することで、任意のデザインセットを確認できます。
-
-```
-makeshop-smarty/
-└── html/                                    # Apache document root
-    ├── designset-YYYYMMDDHHMMSS-NAME-extracted/  # デザインセットフォルダ
-    │   ├── config.json                           # デザインセット設定
-    │   ├── data.json                            # テンプレート用サンプルデータ（★新規追加）
-    │   ├── _module_/                            # モジュールテンプレート
-    │   │   ├── header.html
-    │   │   ├── footer.html
-    │   │   ├── side.html
-    │   │   └── ...
-    │   └── standard/
-    │       ├── html/                            # メインテンプレート
-    │       │   ├── top.html
-    │       │   ├── item.html
-    │       │   ├── cart.html
-    │       │   └── ...
-    │       ├── css/                             # スタイルシート
-    │       │   ├── common.css
-    │       │   ├── item.css
-    │       │   └── ...
-    │       └── javascript/                      # JavaScript
-    │           ├── common.js
-    │           ├── item.js
-    │           └── ...
-    ├── index.php                               # デザインセット選択画面
-    ├── makeshop.php                            # テンプレートエンジン
-    └── .htaccess                               # リライトルール
 ```
 
 ## 使用方法
 
-### 1. デザインセットの配置
+### 1. ローカルでの開発 (Web UIの利用)
 
-デザインセットフォルダ（例：`designset-20250706003155-cdar`）をhtmlフォルダ内に配置します。
+#### デザインセットの配置
+デザインセットフォルダ（例：`designset-20250706003155-cdar`）を`html`フォルダ内に配置してください。
 
-### 2. サンプルデータの作成
-
-デザインセットフォルダ内に `data.json` ファイルを作成し、テンプレートで使用するサンプルデータを定義します。
+#### サンプルデータの作成
+デザインセットフォルダ内に `data.json` ファイルを作成し、テンプレートで使用するサンプルデータを定義してください。
 
 ```json
 {
@@ -114,74 +83,129 @@ makeshop-smarty/
 }
 ```
 
-### 3. アクセス方法
+#### ディレクトリ構成
 
-1. **デザインセット選択**: `http://localhost:8080/` にアクセス
-2. **テンプレート表示**: デザインセットを選択後、表示したいテンプレートをクリック
-
-### 4. 静的ファイルへのアクセス
-
-CSS、JavaScript、画像ファイルは以下のURLでアクセスできます：
+以下のディレクトリ構成を推奨します。
 
 ```
-http://localhost:8080/designsets/デザインセット名/standard/css/common.css
-http://localhost:8080/designsets/デザインセット名/standard/javascript/common.js
+makeshop-smarty/
+└── html/                                    # Apacheドキュメントルート
+    ├── designset-YYYYMMDDHHMMSS-NAME-extracted/  # デザインセットフォルダを配置する場所
+    │   ├── config.json                           # デザインセット設定ファイル
+    │   ├── data.json                            # テンプレートに引き渡すサンプルデータ
+    │   ├── _module_/                            # モジュールテンプレート
+    │   │   ├── header.html
+    │   │   ├── footer.html
+    │   │   ├── side.html
+    │   │   └── ...
+    │   └── standard/
+    │       ├── html/                            # メインテンプレート
+    │       │   ├── top.html
+    │       │   ├── item.html
+    │       │   ├── cart.html
+    │       │   └── ...
+    │       ├── css/                             # スタイルシート
+    │       │   ├── common.css
+    │       │   ├── item.css
+    │       │   └── ...
+    │       └── javascript/                      # JavaScriptファイル
+    │           ├── common.js
+    │           ├── item.js
+    │           └── ...
+    ├── index.php                               # デザインセット選択用Web UIファイル
+    ├── makeshop.php                            # Smartyエンジン本体（テンプレートレンダリング、APIリクエスト処理）
+    ├── api.php                                 # テンプレートレンダリングAPIのエントリポイント
+    └── .htaccess                               # URLルーティング、静的ファイルキャッシュ設定
 ```
 
-## テンプレート記法
+##### 遵守事項
 
-### Smarty デリミター
+*   デザインセットフォルダ名は、`designset-` で開始してください。
+*   デザインセットフォルダは、`html/`フォルダ内に配置してください。
+*   テンプレートファイルは、`.html`拡張子を使用してください。
+*   `data.json`ファイルは、有効なJSON形式で記述してください。
+*   (APIを使用しない場合) 静的ファイル（画像ファイルなど）は、適切なディレクトリ（例: `standard/images/`）に配置してください。
 
-```smarty
-<{$変数名}>              # 変数出力
-<{if $条件}>...</{/if}>   # 条件分岐
-<{section name=i loop=$配列}>...</{/section}>  # ループ
+#### アクセス方法
+1.  **デザインセット選択**: `http://localhost:8080/` にアクセスすると、デザインセットの一覧が表示されます。
+2.  **テンプレート表示**: 目的のデザインセットを選択し、表示したいテンプレートをクリックしてください。
+
+##### 静的ファイルへのアクセス
+CSS、JavaScript、画像ファイルは、以下のURLで直接アクセス可能です。
+
+```
+http://localhost:8080/designsets/あなたのデザインセット名/standard/css/common.css
+http://localhost:8080/designsets/あなたのデザインセット名/standard/javascript/common.js
+http://localhost:8080/designsets/あなたのデザインセット名/standard/images/your_image.png
 ```
 
-### モジュール呼び出し
+### 2. APIでの利用 (プログラムからのテンプレートレンダリング)
 
-```smarty
-<{$module.header}>   # _module_/header.html を読み込み
-<{$module.footer}>   # _module_/footer.html を読み込み
-<{$module.side}>     # _module_/side.html を読み込み
+*   エンドポイント: `POST http://localhost:8080/api/render`
+*   Content-Type: `application/json`
+
+#### リクエストボディの例
+
+```json
+{
+  "designset": "designset-20250706003155-cdar",
+  "template": "top.html",
+  "data": {
+    "shop": {
+      "name": "API経由のショップ名",
+      "copyright": "© 2024 API Rendered"
+    },
+    "page": {
+      "title": "APIで動的にレンダリングされたページ"
+    }
+  }
+}
 ```
 
-### よく使用される変数
+*   `designset` (string, 任意): レンダリング対象のデザインセットフォルダ名。省略した場合、最初に見つかったデザインセットが使用されます。
+*   `cdar_url` (string, 任意): リモート`.cdar`ファイルのURL。指定した場合、ローカルのデザインセットよりも優先され、リモートのCDARファイルがダウンロードされてレンダリングされます。
+*   `template` (string, 必須): レンダリング対象のテンプレートファイル名 (例: `item.html`)。
+*   `data` (object, 任意): テンプレートに引き渡す追加データ。`data.json`のデータに上書きされます。
 
-```smarty
-<{$shop.name}>           # ショップ名
-<{$page.title}>          # ページタイトル
-<{$page.css}>            # CSSファイルのパス
-<{$page.javascript}>     # JavaScriptファイルのパス
-<{$new_item.list}>       # 新商品リスト
-<{$recommend_item.list}> # おすすめ商品リスト
-<{$category_menu.list}>  # カテゴリーメニュー
+#### レスポンスボディの例 (成功時)
+
+```json
+{
+  "status": "ok",
+  "page": "<!-- レンダリングされたHTML/CSS/JavaScriptコンテンツ -->"
+}
 ```
 
-## デバッグ
+#### レスポンスボディの例 (エラー時)
+
+```json
+{
+  "status": "fail",
+  "reason": "Smartyなどのエラーメッセージ",
+  "reason_code": 400
+}
+```
+
+## デバッグガイド
 
 ### データ構造の確認
 
-テンプレートパラメータを指定せずにアクセスすると、利用可能なデータ構造が表示されます：
+テンプレートに引き渡されているデータ構造を確認したい場合は、テンプレート名を指定せずにアクセスしてください。
 
 ```
 http://localhost:8080/makeshop.php?designset=YOUR_DESIGN_SET
 ```
 
+これにより、data.jsonで設定された利用可能なデータ構造が全て表示され、テンプレート開発に役立ちます。
+
 ### エラーの確認
 
-- ファイルが見つからない場合は404エラーが表示されます
-- データの構造に問題がある場合はPHPエラーが表示されます
-
-## 注意事項
-
-- デザインセットフォルダ名は `designset-` で始まる必要があります
-- デザインセットフォルダは `html/` フォルダ内に配置してください
-- テンプレートファイルは `.html` 拡張子を使用します
-- `data.json` ファイルは有効なJSON形式である必要があります
-- 画像ファイルなどの静的ファイルは適切なディレクトリに配置してください
+*   ファイルが見つからない場合は、ブラウザに404エラーが表示されます。パスが正しいか確認してください。
+*   データに問題がある場合や、PHP処理でエラーが発生した場合は、PHPのエラーが表示されます。関連するログも確認してください。
 
 ## ライセンス
 
-- [MIT License (do-mu-oi/makeshop-smarty)](./LICENSE)
-- [MIT License (Dosugamea/makeshop-smarty-emulator)](./LICENSE)
+本プロジェクトのライセンスは、以下の通りです。
+
+*   [MIT License (do-mu-oi/makeshop-smarty)](./LICENSE)
+*   [MIT License (Dosugamea/makeshop-smarty-emulator)](./LICENSE)
