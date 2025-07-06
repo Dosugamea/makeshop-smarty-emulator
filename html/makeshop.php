@@ -1173,6 +1173,10 @@ function replace_external_assets_with_inline(string $html, string $inlineAssets)
     // 外部URL（http://、https://、//で始まるもの）は残す
     $html = preg_replace('/<script[^>]*src=["\'](?!https?:\/\/|\/\/)[^"\']*\.js["\'][^>]*><\/script>/i', '', $html);
     
+    // スキーム省略のURL（//で始まる）をhttps://に変換
+    $html = preg_replace('/(<link[^>]*href=["\'])\/\/([^"\']*["\'][^>]*>)/i', '$1https://$2', $html);
+    $html = preg_replace('/(<script[^>]*src=["\'])\/\/([^"\']*["\'][^>]*><\/script>)/i', '$1https://$2', $html);
+    
     // <head>タグの終了直前にインライン化されたアセットを挿入
     if (preg_match('/<\/head>/i', $html)) {
         $html = preg_replace('/(<\/head>)/i', $inlineAssets . "\n$1", $html);
