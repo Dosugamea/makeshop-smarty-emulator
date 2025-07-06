@@ -7,9 +7,22 @@
 ![Modified by Claude](https://img.shields.io/badge/Modified%20by-Claude-D97757?style=flat-square&logo=claude)
 ![Modified by Gemini](https://img.shields.io/badge/Modified%20by-Gemini-4285F4?style=flat-square&logo=google-gemini)
 
+<table width="100%">
+  <tr>
+    <td width="50%">
+      <img src="screenshot-left.png" alt="Web UI デザインセット選択画面" style="width:100%;">
+    </td>
+    <td width="50%">
+      <img src="screenshot-right.png" alt="商品詳細ページ表示例" style="width:100%;">
+    </td>
+  </tr>
+</table>
+
 本ツールは、GMO makeshopのデザインテンプレート開発を支援するためのSmartyデザインテンプレートエミュレータです（非公式）。
 
 [do-mu-oi/makeshop-smarty](https://github.com/do-mu-oi/makeshop-smarty) をベースに、機能拡張と利便性の向上を図っています。
+
+
 
 ## 主要機能
 
