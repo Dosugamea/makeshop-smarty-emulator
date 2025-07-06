@@ -1165,11 +1165,13 @@ function render_from_remote_cdar(string $cdarUrl, string $templateName, array $a
  * レンダリングされたHTMLから外部CSSとJavaScriptリンクを削除して、インライン化されたアセットに置き換える
  */
 function replace_external_assets_with_inline(string $html, string $inlineAssets): string {
-    // 外部CSSリンクを削除
-    $html = preg_replace('/<link[^>]*href=["\'][^"\']*\.css["\'][^>]*>/i', '', $html);
+    // 同一ドメインのCSSリンクのみを削除（相対パスや /designsets/ などのパス）
+    // 外部URL（http://、https://、//で始まるもの）は残す
+    $html = preg_replace('/<link[^>]*href=["\'](?!https?:\/\/|\/\/)[^"\']*\.css["\'][^>]*>/i', '', $html);
     
-    // 外部JavaScriptリンクを削除
-    $html = preg_replace('/<script[^>]*src=["\'][^"\']*\.js["\'][^>]*><\/script>/i', '', $html);
+    // 同一ドメインのJavaScriptリンクのみを削除（相対パスや /designsets/ などのパス）
+    // 外部URL（http://、https://、//で始まるもの）は残す
+    $html = preg_replace('/<script[^>]*src=["\'](?!https?:\/\/|\/\/)[^"\']*\.js["\'][^>]*><\/script>/i', '', $html);
     
     // <head>タグの終了直前にインライン化されたアセットを挿入
     if (preg_match('/<\/head>/i', $html)) {
