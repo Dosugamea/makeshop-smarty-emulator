@@ -4,3 +4,4 @@
 /html/templates_c
 /html/designset-*
 !html/designset-example
+**/node_modules
