@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# APIエンドポイントへのルーティング
+RewriteRule ^api/render/?$ api.php [L]
+
 # デザインセットの静的ファイルへのアクセス
 # /designsets/DESIGN_SET_NAME/path/to/file にアクセスした場合
 # makeshop.php?designset=DESIGN_SET_NAME&static=path/to/file にリダイレクト
