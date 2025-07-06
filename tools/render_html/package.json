@@ -16,6 +16,6 @@
     "nodemon": "^3.0.1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "description": "HTML to Image rendering API"
 }

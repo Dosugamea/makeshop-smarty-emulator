@@ -144,4 +144,4 @@ if (result.success) {
 
 ## ライセンス
 
-ISC 
+MIT
